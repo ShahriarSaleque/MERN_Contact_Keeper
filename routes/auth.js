@@ -12,7 +12,7 @@ const { check, validationResult } = require("express-validator");
 const User = require("../models/User");
 
 //route     @GET /api/auth
-//desc      AUTH USER AND GAIN JWT
+//desc      AUTH USER AND SEND JWT
 //access    PRIVATE
 router.get("/", auth, async (req, res) => {
   try {

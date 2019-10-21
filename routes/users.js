@@ -35,7 +35,7 @@ router.post(
       if (user) {
         return res.status(400).json({ msg: "User already exists " });
       } else {
-        //Create a User instance
+        // Create a User instance
         user = new User({
           name: name,
           email: email,

@@ -65,8 +65,37 @@ router.post(
 //route     @PUT /api/contacts/:id
 //desc      UPDATE A USER CONTACT
 //access    PRIVATE
-router.put("/:id", (req, res) => {
-  res.send("UPDATE A USER CONTACT");
+router.put("/:id", auth, async (req, res) => {
+  const { name, email, phone, type } = req.body;
+  const contact = await Contact.findById(req.params.id);
+
+  if (!contact) {
+    return res.status(400).json({ msg: "Contact not found" });
+  } else {
+    let contactObject = {};
+    if (name) contactObject.name = name;
+    if (email) contactObject.email = email;
+    if (phone) contactObject.phone = phone;
+    if (type) contactObject.type = type;
+
+    //Check to see if contact is specific to the user
+    if (contact.user.toString() !== req.user.id) {
+      return res.status(401).send("Not authorized");
+    } else {
+      try {
+        //Update contact entry in DB
+        await Contact.findByIdAndUpdate(
+          req.params.id,
+          { $set: contactObject },
+          { new: true }
+        );
+        return res.json(contact);
+      } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: "Internal Server Error" });
+      }
+    }
+  }
 });
 
 //route     @DELETE /api/contacts/:id
