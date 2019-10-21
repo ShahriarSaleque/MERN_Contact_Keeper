@@ -14,8 +14,15 @@ const User = require("../models/User");
 //route     @GET /api/auth
 //desc      AUTH USER AND GAIN JWT
 //access    PRIVATE
-router.get("/", auth, (req, res) => {
-  res.send("SEND JWT TO AUTH USER");
+router.get("/", auth, async (req, res) => {
+  //Get user info from token
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    return res.json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 //route     @GET /api/auth
