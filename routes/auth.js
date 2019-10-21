@@ -15,9 +15,10 @@ const User = require("../models/User");
 //desc      AUTH USER AND GAIN JWT
 //access    PRIVATE
 router.get("/", auth, async (req, res) => {
-  //Get user info from token
   try {
+    //Get user info from token
     const user = await User.findById(req.user.id).select("-password");
+    console.log(user);
     return res.json(user);
   } catch (error) {
     console.log(error);

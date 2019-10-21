@@ -1,11 +1,23 @@
 const express = require("express");
 const router = express.Router();
 
+const auth = require("../middleware/auth");
+
+//Bring in all the Schemas
+const User = require("../models/User");
+const Contact = require("../models/Contact");
+
 //route     @GET /api/contacts
 //desc      GET ALL THE USERS CONTACTS
-//access    PUBLIC
-router.get("/", (req, res) => {
-  res.send("GET ALL USERS CONTACTS ");
+//access    PRIVATE
+router.get("/", auth, async (req, res) => {
+  try {
+    const contacts = await Contact.find({ user: req.user.id });
+    return res.json(contacts);
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({ msg: "Resource is not found" });
+  }
 });
 
 //route     @POST /api/contacts

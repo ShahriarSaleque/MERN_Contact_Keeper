@@ -1,4 +1,3 @@
-const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 
@@ -16,6 +15,6 @@ module.exports = function(req, res, next) {
     }
   } catch (error) {
     console.log(error);
-    res.status(401).json({ msg: "Invalid User credentials" });
+    res.status(401).json({ msg: "Invalid Token " });
   }
 };
