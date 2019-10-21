@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
 
 const { check, validationResult } = require("express-validator");
 
@@ -20,12 +21,37 @@ router.post(
       min: 6
     })
   ],
-  (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    res.send("Valid data entered");
+    //Check to see if the user already exists
+    const { name, email, password } = req.body;
+    try {
+      let user = await User.findOne({ email });
+      if (user) {
+        return res.status(400).json({ msg: "User already exists " });
+      } else {
+        //Create a User instance
+        user = new User({
+          name: name,
+          email: email,
+          password: password
+        });
+        //Hash the password and save again
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+        user.password = hash;
+
+        //Insert instance to DB
+        await user.save();
+        return res.status(200).json({ msg: "User entered to database" });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send("Internal Server Error");
+    }
   }
 );
 
