@@ -5,18 +5,15 @@ const ContactSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "users"
   },
-
   name: {
     type: String,
     required: true
   },
   email: {
-    type: String,
-    required: true
+    type: String
   },
   phone: {
-    type: String,
-    required: true
+    type: String
   },
   type: {
     type: String,

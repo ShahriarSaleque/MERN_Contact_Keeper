@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const auth = require("../middleware/auth");
+const { check, validationResult } = require("express-validator");
 
 //Bring in all the Schemas
 const User = require("../models/User");
@@ -22,21 +23,55 @@ router.get("/", auth, async (req, res) => {
 
 //route     @POST /api/contacts
 //desc      INSERT A USER CONTACT
-//access    PUBLIC
-router.post("/", (req, res) => {
-  res.send("ENTER A CONTACT ");
-});
+//access    PRIVATE
+router.post(
+  "/",
+  [
+    auth,
+    [
+      check("name", "Name field is required")
+        .not()
+        .isEmpty()
+    ]
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ msg: "Invalid Contact credentials" });
+    } else {
+      //Make a contact and add to Schema
+      const { name, email, phone, type } = req.body;
+      // console.log(req.body);
+      try {
+        const newContact = new Contact({
+          name,
+          email,
+          phone,
+          type,
+          user: req.user.id
+        });
+        //Insert instance into DB
+        const contact = await newContact.save();
+
+        return res.json(contact);
+      } catch (error) {
+        console.log(error);
+        return res.status(500).send("Internal Server Error");
+      }
+    }
+  }
+);
 
 //route     @PUT /api/contacts/:id
 //desc      UPDATE A USER CONTACT
-//access    PUBLIC
+//access    PRIVATE
 router.put("/:id", (req, res) => {
   res.send("UPDATE A USER CONTACT");
 });
 
 //route     @DELETE /api/contacts/:id
 //desc      DELATE A CONTACT
-//access    PUBLIC
+//access    PRIVATE
 router.delete("/:id", (req, res) => {
   res.send("DELATE A CONTACT");
 });
