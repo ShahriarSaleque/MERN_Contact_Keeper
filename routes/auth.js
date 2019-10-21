@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 
+const auth = require("../middleware/auth");
+
 const { check, validationResult } = require("express-validator");
 
 //Bring in the User model
@@ -12,7 +14,7 @@ const User = require("../models/User");
 //route     @GET /api/auth
 //desc      AUTH USER AND GAIN JWT
 //access    PRIVATE
-router.get("/", (req, res) => {
+router.get("/", auth, (req, res) => {
   res.send("SEND JWT TO AUTH USER");
 });
 
@@ -69,7 +71,7 @@ router.post(
         }
       }
     }
-    res.send("GOT A LOGGED IN USER");
+    res.json({ token });
   }
 );
 
